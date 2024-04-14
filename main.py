@@ -33,7 +33,7 @@ if __name__ == "__main__":
     if st.session_state.authenticated:
         email = st.session_state.get('email', '')
         if email:
-            complaint_form(email)
+            show_complaints(email)
         else:
             st.error("Email not found in session. Please log in again.")
     elif st.session_state.resolver_authenticated:
