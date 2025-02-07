@@ -6,14 +6,15 @@ from datetime import datetime  # Import datetime module
 # Initialize MongoDB client and collections
 client = MongoClient("mongodb://localhost:27017/")
 db = client["project"]
+hostels_collection = db["hostels"]
 complaint_collection = db["complaints"]
 login_collection = db["details"]  # Initialize login collection
 technician_collection = db["technicians"]  # Collection for technicians
 
 # Twilio setup
-TWILIO_ACCOUNT_SID = "AC3676883f1e3a7200adb7ae6316ba672f"
-TWILIO_AUTH_TOKEN = "35743141470e6141b6c4aad729317d14"
-TWILIO_PHONE_NUMBER = "+19123190157"
+TWILIO_ACCOUNT_SID = "AC3a380a02c9afb467e8f2b5490915f5e6"
+TWILIO_AUTH_TOKEN = "ad9d1ae84152ab1206c7e36040ae2d1f"
+TWILIO_PHONE_NUMBER = "+15075127620"
 
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
