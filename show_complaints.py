@@ -50,5 +50,5 @@ def show_complaints():
             st.write(f"Student Name: {complaint['student_name']}, Student ID: {complaint['student_id']}, Room Number: {complaint['room_number']}, Complaint: {complaint['complaint']}, Department: {complaint['department']}")
 
 # Call the function to display the new page
-if __name__ == "__main__":
+if __name__ == "_main_":
     show_complaints()
