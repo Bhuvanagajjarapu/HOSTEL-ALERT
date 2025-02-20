@@ -17,7 +17,6 @@ TWILIO_AUTH_TOKEN = "ad9d1ae84152ab1206c7e36040ae2d1f"
 TWILIO_PHONE_NUMBER = "+15075127620"
 
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
 # Function to send SMS notification
 def send_sms_notification(phone_number, message):
     try:

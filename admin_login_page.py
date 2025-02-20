@@ -19,7 +19,7 @@ def admin_login_page():
     email = st.text_input("Enter your email", key="email_inputs")
     otp_sent = None
 
-    if email.lower() == "bhuvanagajjarapu@gmail.com":
+    if email.lower() == "harikabalusu99@gmail.com":
         if st.button("Send OTP", key='send_otp_btn'):
             user_data = login_collection.find_one({"email": email})
             if user_data:
