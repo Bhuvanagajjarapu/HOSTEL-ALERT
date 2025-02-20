@@ -68,7 +68,7 @@ def send_sms_notification(phone_number, message):
         return False
 
 def resolver_form():
-    st.title("Resolver Form")
+    st.title("Resolver Form👨🏻‍🔧")
     complaint_id = st.text_input("Complaint ID")
     status_options = ["In Progress", "Completed"]
     status = st.selectbox("Status", status_options)

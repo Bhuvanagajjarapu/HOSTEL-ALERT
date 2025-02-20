@@ -35,7 +35,8 @@ def get_floor_room_count(hostel_name, floor_number):
     return 0
 
 def signup_page():
-    new_username = st.text_input("Enter your Register number")
+    st.title("🔐✨ SignUp Page ✨🔐")
+    new_username = st.text_input("🆔 Enter your Register Number")
     name = st.text_input("Enter your name")
     hord = st.selectbox("Hosteler or Regular", ["Hosteler", "DayScholar"])
     if hord == "Hosteler":

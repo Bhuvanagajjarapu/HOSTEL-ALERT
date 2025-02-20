@@ -27,7 +27,7 @@ def send_sms_notification(phone_number, message):
         return False
 
 def resolver_home():
-    st.title("Resolver Home")
+    st.title("Resolver Home👨🏻‍🔧")
     
     # Track completed complaints using session_state
     if 'completed_complaints' not in st.session_state:

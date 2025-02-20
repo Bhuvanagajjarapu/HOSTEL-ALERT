@@ -15,11 +15,11 @@ login_collection = db["details"]
 
 # Function for admin login page
 def admin_login_page():
-    st.title("Welcome to Admin Login Page")
+    st.title("Welcome to Admin Login Page🧑🏻‍💻")
     email = st.text_input("Enter your email", key="email_inputs")
     otp_sent = None
 
-    if email.lower() == "harikabalusu99@gmail.com":
+    if email.lower() == "22b01a12e3@svecw.edu.in":
         if st.button("Send OTP", key='send_otp_btn'):
             user_data = login_collection.find_one({"email": email})
             if user_data:

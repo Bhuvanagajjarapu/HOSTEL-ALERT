@@ -1,54 +1,103 @@
 import streamlit as st
+import os
+import pandas as pd
+from dotenv import load_dotenv
 from pymongo import MongoClient
+import google.generativeai as genai
+
+# Load environment variables
+load_dotenv()
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # MongoDB setup
 client = MongoClient("mongodb://localhost:27017/")
 db = client["project"]
 complaint_collection = db["complaints"]
-technician_collection = db["technicians"]
 
-# Function to fetch departments from the database
-def get_departments():
-    departments = technician_collection.distinct("department")
-    return departments
+# Function to generate MongoDB query using LLM
+def get_mongo_query(question, prompt):
+    model = genai.GenerativeModel('gemini-pro')
+    response = model.generate_content([prompt[0], question])
+    return response.text.strip()
 
-# Function to fetch complaints for a specific hostel and department
-def get_complaints_for_hostel_and_department(hostel, department):
-    query = {"hostel": hostel}
-    if department:
-        query["department"] = department
-    complaints = list(complaint_collection.find(query, {"_id": 0, "student_name": 1, "student_id": 1, "room_number": 1, "complaint": 1, "department": 1}))
+# Function to fetch complaints based on the generated query
+def get_complaints(query):
+    try:
+        mongo_query = eval(query)  # Convert string to dictionary
+        complaints = list(complaint_collection.find(mongo_query, {"_id": 0}))
+        return complaints
+    except Exception as e:
+        return str(e)
+
+# LLM Prompt
+prompt = [
+    """
+    You are an expert in converting English questions to MongoDB queries!
+    The database 'project' has a collection 'complaints' with fields:
+    - student_name (String)
+    - student_id (String)
+    - hostel (String)
+    - room_number (String)
+    - complaint (String)
+    - department (String)
     
-    # Fetch department information from technicians collection
-    technician_department = technician_collection.find_one({"hostel": hostel, "department": department}, {"_id": 0, "department": 1})
-    if technician_department:
-        department_name = technician_department.get("department")
-        for complaint in complaints:
-            complaint["department"] = department_name
+    Convert user queries into MongoDB queries.
+    Example 1: "Show me complaints from Saradha Hostel"
+    Output: {"hostel": "Saradha"}
     
-    return complaints
+    Example 2: "What are the complaints related to plumbing?"
+    Output: {"department": "Plumbing"}
+    
+    Do not include any extra text in the response. Only return the query in dictionary format.
+    """
+]
 
-# New page function
-def show_complaints():
-    st.title("Welcome")
+# Streamlit UI
+st.set_page_config(page_title="Admin Dashboard", layout="wide")  # Better layout
 
-    # Select hostel
-    st.write("Select a hostel:")
-    hostels = complaint_collection.distinct("hostel")
-    selected_hostel = st.selectbox("Hostel", hostels)
+# Top bar with logout button
+col1, col2 = st.columns([8, 1])  # Space allocation: 8 parts content, 1 part button
+if st.button("Logout", key="logout_bottom"):
+    st.session_state.clear()
+    st.rerun()
 
-    # Select department
-    st.write("Select a department (optional):")
-    departments = [""] + get_departments()  # Populate departments from the database
-    selected_department = st.selectbox("Department", departments)
+  # Redirect to Admin Login Page
 
-    # Fetch and display complaints
-    if selected_hostel:
-        st.write(f"Complaints for {selected_hostel}:")
-        complaints = get_complaints_for_hostel_and_department(selected_hostel, selected_department)
-        for complaint in complaints:
-            st.write(f"Student Name: {complaint['student_name']}, Student ID: {complaint['student_id']}, Room Number: {complaint['room_number']}, Complaint: {complaint['complaint']}, Department: {complaint['department']}")
+st.title("Admin Dashboard - Complaints")
 
-# Call the function to display the new page
-if __name__ == "_main_":
-    show_complaints()
+question = st.text_input("Ask a query about complaints:", key="input")
+submit = st.button("Get Complaints")
+
+if submit and question:
+    query = get_mongo_query(question, prompt)
+    complaints = get_complaints(query)
+    
+    if isinstance(complaints, list) and complaints:
+        # Convert data to DataFrame
+        df = pd.DataFrame(complaints)
+
+        # Ensure columns are properly ordered
+        expected_columns = ["student_name", "student_id", "hostel", "room_number", "complaint", "department"]
+        
+        # Ensure missing columns don't cause errors
+        for col in expected_columns:
+            if col not in df.columns:
+                df[col] = None  # Add missing columns with None values
+
+        df = df[expected_columns]  # Reorder columns
+
+        # Replace 'CHOOSE DEPARTMENT' with 'Not Assigned' for clarity
+        df["department"] = df["department"].replace("CHOOSE DEPARTMENT", "Not Assigned")
+
+        # Display data in table format
+        st.subheader("Complaints List")
+        st.dataframe(df)  # Display as a table
+    else:
+        st.info("No complaints found for the given query.")
+
+# Logout button at bottom for better accessibility
+ # Redirect to Admin Login Page
+if st.button("Logout"):
+    st.session_state.clear()
+    st.rerun()  # Forces the app to refresh, showing the login page
+

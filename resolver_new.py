@@ -16,7 +16,7 @@ db = client["project"]
 complaint_collection = db["complaints"]
 resolver_collection = db["resolvers"]
 def resolver_new():
-    st.title("Resolver Page")
+    st.title("Resolver Page👨🏻‍🔧")
     st.write("Enter your phone number to log in:")
     phone_number_key = "phone_number_input"
     phone_number = st.text_input("Phone Number", key=phone_number_key)
