@@ -1,83 +1,218 @@
+# import streamlit as st
+# from pymongo import MongoClient
+# from bson import ObjectId
+# import smtplib
+# from email.mime.text import MIMEText
+# from email.mime.multipart import MIMEMultipart
+
+# # MongoDB Connection
+# client = MongoClient("mongodb://localhost:27017/")
+# db = client["project"]
+# complaint_collection = db["complaints"]
+
+# # Email Configuration
+# EMAIL_SENDER = "gajjarapubhuvana@gmail.com"
+# EMAIL_PASSWORD = "uhgf gktr rcsn jwst"
+
+# def send_email_notification(to_email, subject, message):
+#     try:
+#         msg = MIMEMultipart()
+#         msg["From"] = EMAIL_SENDER
+#         msg["To"] = to_email
+#         msg["Subject"] = subject
+#         msg.attach(MIMEText(message, "plain"))
+
+#         server = smtplib.SMTP("smtp.gmail.com", 587)
+#         server.starttls()
+#         server.login(EMAIL_SENDER, EMAIL_PASSWORD)
+#         server.sendmail(EMAIL_SENDER, to_email, msg.as_string())
+#         server.quit()
+        
+#         return True
+#     except Exception as e:
+#         st.error(f"Error sending email: {e}")
+#         return False
+
+# def resolver_home():
+#     st.title("Resolver Home 👨🏻‍🔧")
+
+#     # Ensure resolver is authenticated
+#     if "resolver_authenticated" not in st.session_state or not st.session_state.resolver_authenticated:
+#         st.error("You must log in first!")
+#         return
+
+#     resolver_type = st.session_state.resolver_type
+
+#     st.subheader(f"Viewing complaints for: {resolver_type}")
+
+#     # Fetch only complaints for the logged-in resolver's department
+#     complaints_cursor = complaint_collection.find({"department": resolver_type, "status": {"$ne": "Completed"}})
+
+#     if complaint_collection.count_documents({"status": {"$ne": "Completed"}}) == 0:
+
+#         st.info("No pending complaints for your department.")
+#         return
+
+#     for complaint in complaints_cursor:
+#         with st.expander(f"Complaint {complaint['_id']}"):
+#             display_complaint_details(complaint)
+
+# def display_complaint_details(complaint):
+#     st.subheader("Complaint Details:")
+#     st.write(f"👤 Student Name: {complaint['student_name']}")
+#     st.write(f"🏠 Hostel: {complaint['hostel']}")
+#     st.write(f"🔢 Room Number: {complaint['room_number']}")
+#     st.write(f"📧 Email: {complaint['email']}")
+#     st.write(f"🔧 Department: {complaint['department']}")
+#     st.write(f"📝 Complaint: {complaint['complaint']}")
+
+#     with st.form(key=f"form_{complaint['_id']}"):
+#         status = st.selectbox("Update Status:", ["In Progress", "Completed"])
+#         submit = st.form_submit_button("Submit")
+
+#         if submit:
+#             update_complaint_status(complaint, status)
+
+# def update_complaint_status(complaint, status):
+#     complaint_id = complaint['_id']
+#     student_name = complaint['student_name']
+#     student_email = complaint['email']
+#     department = complaint['department']
+#     complaint_text = complaint['complaint']
+
+#     if status == "Completed":
+#         complaint_collection.delete_one({"_id": ObjectId(complaint_id)})
+#         st.session_state.completed_complaints.append(complaint_id)
+#     else:
+#         complaint_collection.update_one(
+#             {"_id": ObjectId(complaint_id)},
+#             {"$set": {"status": status}}
+#         )
+
+#     st.success(f"Status updated to '{status}' successfully!")
+
+#     # Email Subject: Complaint ID (ObjectId)
+#     subject = f"Complaint Update - {complaint_id}"
+
+#     # Email Body
+#     message = f"""
+#     Hello {student_name},
+
+#     Your complaint regarding {department} has been updated.
+    
+#     🏠 Issue: {complaint_text}
+#     ✅ Status: {status}
+    
+#     A technician has reviewed your complaint. Thank you!
+#     """
+
+#     if send_email_notification(student_email, subject, message):
+#         st.success(f"Email notification sent to {student_email}.")
+#     else:
+#         st.error("Failed to send email notification.")
+
+# if __name__ == "__main__":
+#     resolver_home()
 import streamlit as st
 from pymongo import MongoClient
 from bson import ObjectId
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
-# Initialize MongoDB client and collections
+# MongoDB Connection
 client = MongoClient("mongodb://localhost:27017/")
 db = client["project"]
 complaint_collection = db["complaints"]
-resolver_collection = db["resolvers"]
 
-# Twilio credentials
-TWILIO_ACCOUNT_SID = "AC3676883f1e3a7200adb7ae6316ba672f"
-TWILIO_AUTH_TOKEN = "35743141470e6141b6c4aad729317d14"
-TWILIO_PHONE_NUMBER = "+19123190157"
+# Email Configuration
+EMAIL_SENDER = "gajjarapubhuvana@gmail.com"
+EMAIL_PASSWORD = "uhgf gktr rcsn jwst"
 
-def send_sms_notification(phone_number, message):
+def send_email_notification(to_email, subject, message):
     try:
-        # Twilio client initialization is missing in your code. Assuming you have already initialized it elsewhere.
-        # twilio_client.messages.create(
-        #     to=phone_number,
-        #     from_=TWILIO_PHONE_NUMBER,
-        #     body=message
-        # )
+        msg = MIMEMultipart()
+        msg["From"] = EMAIL_SENDER
+        msg["To"] = to_email
+        msg["Subject"] = subject
+        msg.attach(MIMEText(message, "plain"))
+
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(EMAIL_SENDER, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_SENDER, to_email, msg.as_string())
+        server.quit()
+
         return True
     except Exception as e:
-        st.error(f"Error sending SMS: {e}")
+        st.error(f"Error sending email: {e}")
         return False
 
 def resolver_home():
-    st.title("Resolver Home👨🏻‍🔧")
-    
-    # Track completed complaints using session_state
-    if 'completed_complaints' not in st.session_state:
-        st.session_state.completed_complaints = []
+    st.title("Resolver Dashboard 👨🏻‍🔧")
 
-    # Display list of complaints
-    complaints_cursor = complaint_collection.find({"status": {"$ne": "Completed"}})  # Filter out completed complaints
+    if not st.session_state.resolver_authenticated:
+        st.error("You must log in first!")
+        return
+
+    resolver_type = st.session_state.resolver_type
+    st.subheader(f"Complaints for: {resolver_type}")
+
+    complaints_cursor = complaint_collection.find({"department": resolver_type, "status": {"$ne": "Completed"}})
+
+    if complaint_collection.count_documents({"status": {"$ne": "Completed"}}) == 0:
+        st.info("No pending complaints for your department.")
+        return
+
     for complaint in complaints_cursor:
-        if complaint['_id'] not in st.session_state.completed_complaints:
-            with st.expander(f"Complaint {complaint['_id']}"):
-                display_complaint_details(complaint)
+        with st.expander(f"Complaint {complaint['_id']}"):
+            st.write(f"👤 **Student Name:** {complaint['student_name']}")
+            st.write(f"🏠 **Hostel:** {complaint['hostel']}")
+            st.write(f"📧 **Email:** {complaint['email']}")
+            st.write(f"📝 **Complaint:** {complaint['complaint']}")
 
-def display_complaint_details(complaint):
-    st.subheader("Complaint Details:")
-    st.write(f"Student ID: {complaint['student_id']}")
-    st.write(f"Hostel: {complaint['hostel']}")
-    st.write(f"Room Number: {complaint['room_number']}")
-    st.write(f"Email: {complaint['email']}")
-    st.write(f"Complaint: {complaint['complaint']}")
-    st.write(f"Department: {complaint['department']}")
+            with st.form(key=f"form_{complaint['_id']}"):
+                status = st.selectbox("Update Status:", ["In Progress", "Completed"])
+                submit = st.form_submit_button("Submit")
 
-    with st.form(key=f"form_{complaint['_id']}"):
-        st.write("Update Status:")
-        status = st.selectbox("Select Status:", ["In Progress", "Completed"])
-        st.form_submit_button("Submit")
-        if status == "Completed":
-            update_complaint_status(complaint['_id'], status)
+                if submit:
+                    update_complaint_status(complaint, status)
 
-def update_complaint_status(complaint_id, status):
-    complaint_collection.update_one(
-        {"_id": ObjectId(complaint_id)},
-        {"$set": {"status": status}}
-    )
-    st.success("Status updated successfully!")
+def update_complaint_status(complaint, status):
+    complaint_id = complaint['_id']
+    student_email = complaint["email"]
+    student_name = complaint["student_name"]
+    complaint_text = complaint["complaint"]
+
     if status == "Completed":
-        st.session_state.completed_complaints.append(complaint_id)  # Add completed complaint to session state
-
-def notify_user(complaint):
-    resolver = resolver_collection.find_one({"complaint_id": complaint['complaint_id']})
-    if resolver:
-        phone_number = resolver.get("phone_number")
-        if phone_number:
-            message = f"Your complaint with ID {complaint['complaint_id']} has been marked as Completed. Thank you!"
-            if send_sms_notification(phone_number, message):
-                st.success("User notified successfully.")
-            else:
-                st.error("Failed to notify user.")
-        else:
-            st.error("Resolver's phone number is not available.")
+        complaint_collection.delete_one({"_id": ObjectId(complaint_id)})
+        st.success(f"Complaint {complaint_id} marked as 'Completed' and removed from the list.")
     else:
-        st.error("Resolver information not found for this complaint.")
+        complaint_collection.update_one({"_id": ObjectId(complaint_id)}, {"$set": {"status": status}})
+        st.success(f"Status updated to '{status}' successfully!")
 
-resolver_home()
+    # Email Subject
+    subject = f"Complaint Update - {complaint_id}"
+
+    # Email Body
+    message = f"""
+    Hello {student_name},
+
+    Your complaint regarding the following issue has been updated.
+
+    🏠 **Issue:** {complaint_text}
+    ✅ **Status:** {status}
+
+    Thank you for your patience.
+
+    Regards,  
+    Hostel Management Team
+    """
+
+    if send_email_notification(student_email, subject, message):
+        st.success(f"Email notification sent to {student_email}.")
+    else:
+        st.error("Failed to send email notification.")
+
+if __name__ == "__main__":
+    resolver_home()

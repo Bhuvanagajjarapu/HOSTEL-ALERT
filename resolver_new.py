@@ -1,8 +1,45 @@
-import streamlit as st
-from pymongo import MongoClient
-from twilio.rest import Client
-from resolver_home import resolver_home
+# # resolver_new.py
+# import streamlit as st
+# from pymongo import MongoClient
+# import streamlit_extras.switch_page_button as switch_page
 
+# # Allowed Resolver Numbers & Assigned Departments
+# ALLOWED_RESOLVER_NUMBERS = {
+#     "+918919542599": "ELECTRICIAN",
+#     "9550676575": "HOUSEKEEPER",
+#     "07382944698": "TECHSUPPORT",
+#     "7382904875": "PLUMBER",
+#     "9908268058": "AC REPAIR"
+# }
+
+# # MongoDB Connection
+# client = MongoClient("mongodb://localhost:27017/")
+# db = client["project"]
+# complaint_collection = db["complaints"]
+
+# def resolver_new():
+#     st.title("Resolver Page 👨🏻‍🔧")
+#     st.write("Enter your phone number to log in:")
+    
+#     phone_number = st.text_input("Phone Number")
+    
+#     if st.button("Login"):
+#         if phone_number in ALLOWED_RESOLVER_NUMBERS:
+#             st.session_state.resolver_authenticated = True
+#             st.session_state.resolver_phone_number = phone_number
+#             st.session_state.resolver_type = ALLOWED_RESOLVER_NUMBERS[phone_number]
+#             st.success(f"Logged in as {st.session_state.resolver_type}")
+            
+#             # Redirect to resolver_home.py
+#             switch_page.switch_page("resolver_home")
+#         else:
+#             st.error("Invalid phone number. Please try again.")
+
+# if __name__ == "__main__":
+#     resolver_new()
+import streamlit as st
+
+# Allowed Resolver Numbers & Assigned Departments
 ALLOWED_RESOLVER_NUMBERS = {
     "+918919542599": "ELECTRICIAN",
     "9550676575": "HOUSEKEEPER",
@@ -11,35 +48,17 @@ ALLOWED_RESOLVER_NUMBERS = {
     "9908268058": "AC REPAIR"
 }
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["project"]
-complaint_collection = db["complaints"]
-resolver_collection = db["resolvers"]
 def resolver_new():
-    st.title("Resolver Page👨🏻‍🔧")
-    st.write("Enter your phone number to log in:")
-    phone_number_key = "phone_number_input"
-    phone_number = st.text_input("Phone Number", key=phone_number_key)
-
-    if st.button("Click Here"):
-       
-        if phone_number in ALLOWED_RESOLVER_NUMBERS:
-            resolver_type = ALLOWED_RESOLVER_NUMBERS[phone_number]
-            st.session_state.resolver_authenticated = True
-            st.session_state.resolver_phone_number = phone_number
-            st.session_state.resolver_type = resolver_type
-
-           
-            st.success(f"Logged in as {resolver_type} with phone number {phone_number}")
-            resolver_home()
+    st.title("Resolver Login 👨🏻‍🔧")
     
-            
-
-            
-            st.markdown(f"[Click here to go to Resolver Home](#resolver-home)", unsafe_allow_html=True)
-
+    phone_number = st.text_input("Enter your phone number:")
+    
+    if st.button("Login"):
+        if phone_number in ALLOWED_RESOLVER_NUMBERS:
+            st.session_state.resolver_authenticated = True
+            st.session_state.resolver_type = ALLOWED_RESOLVER_NUMBERS[phone_number]
+            st.success(f"Logged in as {st.session_state.resolver_type}")
         else:
             st.error("Invalid phone number. Please try again.")
 
-if __name__ == "_main_":
-    resolver_new()
+    return st.session_state.resolver_authenticated
