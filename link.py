@@ -15,24 +15,7 @@ def authenticate_user(email, otp_entered):
     user_data = login_collection.find_one({"email": email, "otp": otp_entered})
     return user_data is not None
 
-# Function to send OTP to user's email
-# def send_otp(email):
-#     otp = str(random.randint(1000, 9999))  # Generate a 4-digit OTP
-#     # Send OTP via email
-#     msg = EmailMessage()
-#     msg.set_content(f"Your OTP is: {otp}")
-#     msg['Subject'] = 'Login OTP'
-#     msg['From'] = 'gajjarapubhuvana@gmail.com'  # Update with your email address
-#     msg['To'] = email
-#     try:
-#         with smtplib.SMTP('smtp.gmail.com', 587) as smtp:  # Update with your SMTP server details
-#             smtp.starttls()  # Add this line for TLS encryption
-#             smtp.login('gajjarapubhuvana@gmail.com', 'uhgf gktr rcsn jwst')  # Update with your email credentials
-#             smtp.send_message(msg)
-#         return otp
-#     except Exception as e:
-#         st.error(f"Error sending OTP: {e}")
-#         return None
+
 def send_otp(email):
     otp = str(random.randint(1000, 9999))
     st.session_state['otp_sent'] = otp  # Store OTP in session
@@ -43,7 +26,7 @@ def send_otp(email):
     msg['To'] = email
     with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
         smtp.starttls()
-        smtp.login('gajjarapubhuvana@gmail.com', 'uhgf gktr rcsn jwst')
+        # secret
         smtp.send_message(msg)
     return otp
 

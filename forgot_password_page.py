@@ -1,43 +1,4 @@
-# import streamlit as st
-# from pymongo import MongoClient
-# from twilio.rest import Client
 
-# client = MongoClient("mongodb://localhost:27017/")
-# db = client["project"]
-# detail = db["details"]
-
-# def set_new_password(email, new_password):
-    
-#     detail.update_one({"email": email}, {"$set": {"password": new_password}})
-
-# def forgot_password_page():
-#     st.title("Forgot Password Page")
-#     email = st.text_input("Enter your email:")
-    
-#     new_password = st.text_input("Enter your new password:", type="password")
-#     confirm_password = st.text_input("Confirm your new password:", type="password")
-
-#     if st.button("Reset Password"):
-       
-#         if new_password == confirm_password:
-           
-#             user = detail.find_one({"email": email})
-
-#             if user:
-                
-#                 set_new_password(email, new_password)
-
-               
-#                 st.success("Password successfully reset!")
-
-#             else:
-#                 st.warning("Invalid email address")
-#         else:
-#             st.warning("Passwords do not match")
-
-
-# if __name__ == "__main__":
-#     forgot_password_page()
 import streamlit as st
 import smtplib
 import random
@@ -50,8 +11,7 @@ db = client["project"]
 detail = db["details"]
 
 # Email Credentials (Use App Passwords if 2FA is enabled)
-SENDER_EMAIL = "gajjarapubhuvana@gmail.com"
-SENDER_PASSWORD = "uhgf gktr rcsn jwst"  # Use App Password instead of real password
+# secret
 
 # Function to send OTP via email
 def send_otp(email):
@@ -91,8 +51,8 @@ db = client["project"]
 detail = db["details"]
 
 # Email Credentials (Use App Passwords if 2FA is enabled)
-SENDER_EMAIL = "gajjarapubhuvana@gmail.com"
-SENDER_PASSWORD = "uhgf gktr rcsn jwst"  # Use App Password instead of real password
+  # Use App Password instead of real password
+#   secret
 
 # Function to send OTP via email
 def send_otp(email):

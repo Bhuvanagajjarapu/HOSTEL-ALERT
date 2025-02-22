@@ -50,9 +50,7 @@ def fetch_and_display_complaints(resolver_type):
 client = MongoClient("mongodb://localhost:27017/")
 db = client["project"]
 resolver_collection = db["resolvers"]
-TWILIO_ACCOUNT_SID = "AC3676883f1e3a7200adb7ae6316ba672f"
-TWILIO_AUTH_TOKEN = "35743141470e6141b6c4aad729317d14"
-TWILIO_PHONE_NUMBER = "+19123190157"
+# secret
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 def send_sms_notification(phone_number, message):
